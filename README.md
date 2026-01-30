@@ -7,6 +7,7 @@ Este projeto implementa um sistema utilizando os princípios da Arquitetura Limp
 - Erik Satlher
 - Bernardo Mangaraviti Carrerette
 - Lucas Herbest Lopes
+- João Vitor Henrique da Silva Abreu
 - Andre Tavares Louzada
 - Yuri Sousa Almeida
 
