@@ -75,7 +75,7 @@ public class ArquivoJsonPreco implements IProvedorDePrecos{
     }
     
     @Override
-    public List<String> buscaIngredientes(){
+    public List<String> buscaBebidas(){
         if(cardapio==null){
             return new ArrayList<>();
         }
@@ -86,7 +86,7 @@ public class ArquivoJsonPreco implements IProvedorDePrecos{
     }
     
     @Override
-    public List<String> buscaBebidas(){
+    public List<String> buscaIngredientes(){
         if(cardapio==null){
             return new ArrayList<>();
         }
@@ -95,7 +95,7 @@ public class ArquivoJsonPreco implements IProvedorDePrecos{
         List<String> pizzas= buscaPizzas();
         
         return cardapio.keySet().stream()
-                .filter(item -> !massas.contains(item) && !bebidas.contains(item) && !bebidas.contains(item))
+                .filter(item -> !massas.contains(item) && !bebidas.contains(item) && !pizzas.contains(item))
                 .collect(Collectors.toList());
     }
     
