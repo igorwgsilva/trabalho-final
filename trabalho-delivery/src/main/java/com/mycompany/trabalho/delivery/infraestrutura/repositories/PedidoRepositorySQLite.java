@@ -267,27 +267,31 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
     @Override
     public List<Pedido> buscarPedidosPorCpf(String cpf) {
         List<Pedido> pedidos = new ArrayList<>();
-                String sql= "SELECT p.id FROM pedidos p " +
+        List<Integer> idsEncontrados = new ArrayList<>(); 
+
+        String sql = "SELECT p.id FROM pedidos p " +
                      "JOIN clientes c ON p.cliente_id = c.id " +
                      "WHERE c.cpf = ?";
 
-        try(Connection conexao = ConexaoSingleton.getConexao();
-            PreparedStatement statement = conexao.prepareStatement(sql)) {
+        try (Connection conexao = ConexaoSingleton.getConexao();
+             PreparedStatement statement = conexao.prepareStatement(sql)) {
 
             statement.setString(1, cpf);
             ResultSet rset = statement.executeQuery();
 
             while(rset.next()) {
-                int id = rset.getInt("id");
-                
-                Pedido pedido = buscarPedidoPorId(id);    
-                if(pedido != null){
-                    pedidos.add(pedido);
-                }
+                idsEncontrados.add(rset.getInt("id"));
             }
 
         } catch(SQLException e) {
             e.printStackTrace();
+        }
+        
+        for (Integer id : idsEncontrados) {
+            Pedido pedido = buscarPedidoPorId(id);    
+            if(pedido != null){
+                pedidos.add(pedido);
+            }
         }
         
         return pedidos;

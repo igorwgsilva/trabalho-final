@@ -27,15 +27,9 @@ public class PedidosView extends javax.swing.JFrame {
     
     private NavegadorDeViews navegadorDeViews;
 
-    
-    
-    
     public PedidosView() {
         this.parent=null;
-        
         initComponents();
-        
-        
     }
 
     public PedidosView(JFrame parent, String cpf, PedidosController controller, PedidosPresenter presenter) {
@@ -46,9 +40,6 @@ public class PedidosView extends javax.swing.JFrame {
         initComponents();
         iniciarView();
     }
-    
- 
- 
     
     public void iniciarView(){
         this.setLocationRelativeTo(parent);
@@ -85,6 +76,7 @@ public class PedidosView extends javax.swing.JFrame {
         btnNovoPedido.addActionListener(e -> {
             if (this.navegadorDeViews != null) {
                 this.navegadorDeViews.abrirItensPedidoView(this, this.cpf);
+                atualizarTabela();
             } else {
                 throw new IllegalStateException("Dependência NavegadorDeViews não foi injetada.");
             }
@@ -106,6 +98,7 @@ public class PedidosView extends javax.swing.JFrame {
             int row = tblPedidos.getSelectedRow();
             if (row != -1) { 
                 verPedido(row);
+                atualizarTabela();
             } else {
                 mostrarMensagem("Selecione um pedido para visualizar.");
             }
