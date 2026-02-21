@@ -51,95 +51,88 @@ public class PedidosView extends javax.swing.JFrame {
  
     
     public void iniciarView(){
-//        limparTabelas();//TODO com problema esse metodo
         this.setLocationRelativeTo(parent);
         configurarListeners();
-        setLblCpfCliente(this.cpf); //coloca nome do cliente na lbl da tela
-        atualizarTabela();
-        setVisible(true);  
-        
+        setLblCpfCliente(this.cpf); 
+        atualizarTabela(); 
+        setVisible(true);
     }
     
-    public void limparTabelas(){
-        DefaultTableModel modelTblPedidos = (DefaultTableModel) tblPedidos.getModel(); //limpa tabela
-        modelTblPedidos.setRowCount(0);
-        
-//        DefaultTableModel model = (DefaultTableModel) tblPedidos.getModel();
-//        model.setRowCount(0); 
-    }
-    
-    public void atualizarTabela() { //limpa tabela e preenche com clientes 
-        
+    public void atualizarTabela() {
         DefaultTableModel model = (DefaultTableModel) tblPedidos.getModel();
-        model.setRowCount(0);//limpa tabela
-        presenter.mostrarPedidos(cpf);
+        model.setRowCount(0); // Limpa a tabela
         
         List<PedidoOutputDTO> pedidos = presenter.mostrarPedidos(cpf);
-        for (PedidoOutputDTO c : pedidos) { //preenche com os dados da lista de pedidos
-            model.addRow(new Object[]{c.getId(), c.getValorTotal(), c.getEstado()});
-
+        if (pedidos != null) {
+            for (PedidoOutputDTO pedido : pedidos) {
+                String statusDescricao = "";
+                if (pedido.getEstado() != null) {
+                    statusDescricao = pedido.getEstado().getDescricao();
+                }
+                
+                model.addRow(new Object[]{
+                    pedido.getId(),
+                    pedido.getValorTotal(),
+                    statusDescricao 
+                });
+            }
         }
     }
     
     
-    private void configurarListeners() {
-        
-        //novo pedido (abre a ItensPedidoView)
+   private void configurarListeners() {
+       
         btnNovoPedido.addActionListener(e -> {
             if (this.navegadorDeViews != null) {
-                // Invoca o navegador repassando a própria view como parent e o CPF do contexto
                 this.navegadorDeViews.abrirItensPedidoView(this, this.cpf);
             } else {
                 throw new IllegalStateException("Dependência NavegadorDeViews não foi injetada.");
             }
         });
 
-        //cancelar o pedido selecionado
         btnCancelarPedido.addActionListener((ActionEvent e) -> {
             int row = tblPedidos.getSelectedRow();
-            int idPedidoDaLinha = getIdPedidoDalinha(row);
-            if (row != -1) { //se row == -1 então não tem nenhum pedido na tabela
-                mostrarMensagem("Pedido cancelado com sucesso.");
+            if (row != -1) { 
                 int id = getPedidoSelecionado();
                 controller.cancelarPedido(id);
+                atualizarTabela(); // Atualiza a tabela após a mudança
+                mostrarMensagem("Pedido cancelado com sucesso.");
             } else {
                 mostrarMensagem("Selecione um pedido para cancelar.");
             }
         });
 
-        //visualizar detalhes do pedido
         btnVerPedido.addActionListener((ActionEvent e) -> {
             int row = tblPedidos.getSelectedRow();
-            if (row != -1) { //se row =1 então não tem nenhum pedido na tabela
+            if (row != -1) { 
                 verPedido(row);
             } else {
                 mostrarMensagem("Selecione um pedido para visualizar.");
             }
         });
 
-        // Ação para avançar o estado do pedido (ex: De 'Preparando' para 'Em Entrega')
         btnAvancarEstado.addActionListener((ActionEvent e) -> {
             int row = tblPedidos.getSelectedRow();
             if (row != -1) {
-                mostrarMensagem("Estado avançado com Sucesso.");
                 int id = getPedidoSelecionado();
-                controller.avancarEstado(id);
+                controller.avancarEstado(id); // Muda no banco
+                atualizarTabela();           
+                mostrarMensagem("Estado avançado com Sucesso.");
             } else {
                 mostrarMensagem("Selecione um pedido para avançar o status.");
-                
             }
         });
-//        listener para detectar quando esta janela fechar
+
+       
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 if (parent != null) {
-                    parent.setEnabled(true); //reativa a ClienteView
-                    parent.toFront();        //traz pra frente
+                    parent.setEnabled(true); 
+                    parent.toFront();        
                 }
             }
         }); 
-        
     }
     
     private void novoPedido() {
@@ -198,30 +191,7 @@ public class PedidosView extends javax.swing.JFrame {
         
     }
     
-    private void preencherTabelaPedidos() {
-        if (presenter == null || cpf == null) {
-            return;
-        }
-
-        
-        limparTabelas();//limpa a tabela antes de preencher
-        
-        DefaultTableModel model = getTblModel();
-
-        //chamada ao método da presenter
-        List<PedidoOutputDTO> pedidos = presenter.mostrarPedidos(cpf);
-
-        if (pedidos != null) {
-            for (PedidoOutputDTO pedido : pedidos) {
-                model.addRow(new Object[]{
-                    pedido.getId(),       // Coluna 0: ID Pedido
-                    pedido.getValorTotal(),     // Coluna 1: Data
-                    pedido.getEstado(),   // Coluna 2: Status
-                         
-                });
-            }
-        }
-    }
+   
     
     
     private DefaultTableModel getTblModel(){
@@ -236,16 +206,31 @@ public class PedidosView extends javax.swing.JFrame {
     
     private int getPedidoSelecionado() {
     int index = tblPedidos.getSelectedRow();
-    
+
     if (index != -1) {
         Object valor = tblPedidos.getValueAt(index, 0);
         if (valor != null) {
-            return (int) valor; 
+            try {
+                // Abordagem Segura: Number abrange Integer, Long, etc.
+                if (valor instanceof Number number) {
+                    return number.intValue();
+                }
+
+                // Fallback: Caso o valor esteja como String na tabela
+                return Integer.parseInt(valor.toString());
+            } catch (NumberFormatException e) {
+                // Log de erro técnico (evitar alert() em camadas de lógica)
+                System.err.println("Erro de conversão: Valor da tabela não é um inteiro válido.");
+            }
         }
     }
-    // Retorna -1 para indicar que nenhum pedido foi encontrado/selecionado
     return -1; 
 }
+    public void limparTabelas(){
+        DefaultTableModel modelTblPedidos = (DefaultTableModel) tblPedidos.getModel(); //limpa tabela
+        modelTblPedidos.setRowCount(0);
+    }
+    
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

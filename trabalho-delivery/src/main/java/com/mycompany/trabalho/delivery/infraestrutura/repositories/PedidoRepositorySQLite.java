@@ -42,6 +42,22 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
 
     @Override
     public void salvarPedido(Pedido pedido) {
+        if (pedido.getId() > 0) {
+            String sqlUpdate = "UPDATE pedidos SET status = ? WHERE id = ?";
+            try (Connection conexao = ConexaoSingleton.getConexao();
+                 PreparedStatement stmt = conexao.prepareStatement(sqlUpdate)) {
+                 
+                stmt.setString(1, pedido.getEstado().getDescricao());
+                stmt.setLong(2, pedido.getId());
+                stmt.executeUpdate();
+                System.out.println("Status do pedido " + pedido.getId() + " atualizado no banco.");
+                
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return; // O "return" faz o código parar aqui e não executar o INSERT abaixo!
+        }
+        
         String sqlPedido = "INSERT INTO pedidos(cliente_id, valor_total, status) VALUES (?, ?, ?)";
         String sqlItem = "INSERT INTO itens_pedido(pedido_id, tipo, tamanho, valor_base, descricao_visual) VALUES (?, ?, ?, ?, ?)";
         String sqlAdicional = "INSERT INTO itens_adicionais(item_pedido_id, nome, valor_adicional) VALUES (?, ?, ?)";
@@ -278,11 +294,16 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
     }
 
     private IPedidoState mapearEstado(String descricao) {
-        if (descricao.contains("PENDENTE")) return new PedidoPendenteState();
-        if (descricao.contains("PREPARANDO")) return new PedidoPreparadoState();
-        if (descricao.contains("PRONTO")) return new PedidoProntoState();
-        if (descricao.contains("ENTREGUE")) return new PedidoEntregueState();
-        if (descricao.contains("CANCELADO")) return new PedidoCanceladoState();
+        if (descricao == null) return new PedidoPendenteState();
+        
+        
+        String descUpper = descricao.toUpperCase();
+        if (descUpper.contains("PENDEN")) return new PedidoPendenteState();
+        if (descUpper.contains("PREPARA")) return new PedidoPreparadoState();
+        if (descUpper.contains("PRONT")) return new PedidoProntoState();
+        if (descUpper.contains("ENTREG")) return new PedidoEntregueState();
+        if (descUpper.contains("CANCEL")) return new PedidoCanceladoState();
+        
         return new PedidoPendenteState();
     }
 

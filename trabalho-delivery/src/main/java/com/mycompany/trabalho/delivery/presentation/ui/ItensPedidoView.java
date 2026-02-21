@@ -140,8 +140,6 @@ public class ItensPedidoView extends javax.swing.JFrame {
 
             ItemPedidoBebidaInputDTO bebidaDTO = new ItemPedidoBebidaInputDTO();
             bebidaDTO.setNome(nomeBebida);
-            // bebidaDTO.setPreco(...); // Se você tiver o preço no combo ou em outro lugar, defina aqui
-
             bebidasTemp.add(bebidaDTO);
             adicionarItemNaTabela(bebidasTemp.size(), nomeBebida, 1, 0.0);
             atualizarTotalPedido();
@@ -361,7 +359,7 @@ public class ItensPedidoView extends javax.swing.JFrame {
 
         btnIncluirAdiciona.setText("Incluir Adicional");
 
-        cmbListaPizzasBase.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Quatro Queijos", "Calabresa", "da casa", "Item 4" }));
+        cmbListaPizzasBase.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Quatro Queijos", "Calabresa", "Moda da casa", "Portuguesa", "Frango com Catupiry" }));
 
         lblTotal.setText("Total:");
 
