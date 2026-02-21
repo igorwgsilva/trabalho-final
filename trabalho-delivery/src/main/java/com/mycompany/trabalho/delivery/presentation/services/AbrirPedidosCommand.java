@@ -8,6 +8,7 @@ import com.mycompany.trabalho.delivery.aplicacao.useCases.AvancarEstadoPedidoUse
 import com.mycompany.trabalho.delivery.aplicacao.useCases.BuscarPedidosPorCpfUseCase;
 import com.mycompany.trabalho.delivery.aplicacao.useCases.CancelarPedidoUseCase;
 import com.mycompany.trabalho.delivery.aplicacao.useCases.CriarPedidoUseCase;
+import com.mycompany.trabalho.delivery.dominio.model.pizza.IPizzaFactory;
 import com.mycompany.trabalho.delivery.dominio.port.IClienteRepository;
 import com.mycompany.trabalho.delivery.dominio.port.ILogService;
 import com.mycompany.trabalho.delivery.dominio.port.IPedidoRepository;
@@ -25,6 +26,7 @@ import javax.swing.JFrame;
 public class AbrirPedidosCommand implements INavegacaoCommand{
     private final IPedidoRepository pedidoRepo;
     private final IClienteRepository clienteRepo;
+    private final IPizzaFactory pizzaFactory;
     private final ILogService logService;
     private final NavegadorDeViews navegador;
     private final JFrame parent;
@@ -33,13 +35,15 @@ public class AbrirPedidosCommand implements INavegacaoCommand{
     
     public AbrirPedidosCommand(
             IPedidoRepository pedidoRepo, 
-            IClienteRepository clienteRepo, 
+            IClienteRepository clienteRepo,
+            IPizzaFactory pizzaFactory,
             ILogService logService, 
             NavegadorDeViews navegador, 
             JFrame parent, 
             String cpf) {
         this.pedidoRepo = pedidoRepo;
         this.clienteRepo = clienteRepo;
+        this.pizzaFactory = pizzaFactory;
         this.logService = logService;
         this.navegador = navegador;
         this.parent = parent;
@@ -49,7 +53,7 @@ public class AbrirPedidosCommand implements INavegacaoCommand{
      @Override
     public void executar() {
         //casos de uso(camada de aplicação)
-        CriarPedidoUseCase criarUC = new CriarPedidoUseCase(pedidoRepo, clienteRepo, logService);
+        CriarPedidoUseCase criarUC = new CriarPedidoUseCase(pedidoRepo, clienteRepo, /*logService,*/ pizzaFactory);//TODO IGOR adiconar LOG
         CancelarPedidoUseCase cancelarUC = new CancelarPedidoUseCase(pedidoRepo);
         AvancarEstadoPedidoUseCase avancarUC = new AvancarEstadoPedidoUseCase(pedidoRepo);
         BuscarPedidosPorCpfUseCase buscarUC = new BuscarPedidosPorCpfUseCase(pedidoRepo);

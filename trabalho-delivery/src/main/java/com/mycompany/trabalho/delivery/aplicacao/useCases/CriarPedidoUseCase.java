@@ -1,17 +1,20 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.trabalho.delivery.aplicacao.useCases;
 
+import com.mycompany.trabalho.delivery.aplicacao.dto.ItemPedidoBebidaInputDTO;
+import com.mycompany.trabalho.delivery.aplicacao.dto.ItemPedidoPizzaInputDTO;
+import com.mycompany.trabalho.delivery.dominio.model.bebida.Bebida;
 import com.mycompany.trabalho.delivery.dominio.model.cliente.Cliente;
 import com.mycompany.trabalho.delivery.dominio.model.pedido.Item;
 import com.mycompany.trabalho.delivery.dominio.model.pedido.Pedido;
-import com.mycompany.trabalho.delivery.dominio.model.pedido.PedidoPreparadoState;
+import com.mycompany.trabalho.delivery.dominio.model.pedido.PedidoPendenteState;
+import com.mycompany.trabalho.delivery.dominio.model.pizza.IPizzaFactory;
+import com.mycompany.trabalho.delivery.dominio.model.pizza.PizzaComponente;
 import com.mycompany.trabalho.delivery.dominio.port.IClienteRepository;
 import com.mycompany.trabalho.delivery.dominio.port.ILogService;
 import com.mycompany.trabalho.delivery.dominio.port.IPedidoRepository;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -20,34 +23,48 @@ import java.util.ArrayList;
 public class CriarPedidoUseCase implements ICriarPedidoUseCase {
     private final IPedidoRepository pedidoRepository;
     private final IClienteRepository clienteRepository;
+    private final IPizzaFactory pizzaFactory; 
     private final ILogService logger; 
 
-    public CriarPedidoUseCase(IPedidoRepository pedidoRepository, IClienteRepository clienteRepository , ILogService logger ) {
+   
+    public CriarPedidoUseCase(IPedidoRepository pedidoRepository, IClienteRepository clienteRepository, IPizzaFactory pizzaFactory, ILogService logger) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
+        this.pizzaFactory = pizzaFactory;
         this.logger = logger;
     }
 
-    public CriarPedidoUseCase(IPedidoRepository pedidoRepository, IClienteRepository clienteRepository) {//TODO construtor sem logger para fins de testes
+    public CriarPedidoUseCase(IPedidoRepository pedidoRepository, IClienteRepository clienteRepository, IPizzaFactory pizzaFactory) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
-        this.logger= null; //TODO logger como nulo para testar, remover esse construtor depois
+        this.pizzaFactory = pizzaFactory;
+        this.logger = null; 
     }
     
-    
-
-    @Override
-    public void executar(String cpf) {
-        //recupera o cliente
+    public void executar(String cpf, List<ItemPedidoPizzaInputDTO> pizzas, List<ItemPedidoBebidaInputDTO> bebidas) {
+      
         Cliente cliente = clienteRepository.buscarClientePorCPF(cpf);
+        if (cliente == null) {
+            throw new IllegalArgumentException("Cliente não encontrado para o CPF informado.");
+        }
         
-        //cria a Pedido com lista de itens vazia e estado inicial "Preparando"
+        List<Item> itensPedido = new ArrayList<>();
 
-       Pedido novoPedido = new Pedido(cliente, new ArrayList<Item>(), new PedidoPreparadoState()); //TODO fiz um construtor sem logger para fins de testes, arrumar depois com os parametros comentados abaixo
-//       (logger, cliente, new ArrayList<>(), new PedidoPreparadoState()); // isso são os parametro antigos com o logger, 
-        
-       //Cliente cliente, List<Item> itens, IPedidoState estado, double valorTotal, long id
-       
+        if (pizzas != null) {
+            for (ItemPedidoPizzaInputDTO itemPizza : pizzas) {
+                PizzaComponente pizza = pizzaFactory.criarPizza(itemPizza.getSabor());
+                itensPedido.add(pizza);
+            }
+        }
+
+        if (bebidas != null) {
+            for (ItemPedidoBebidaInputDTO itemBebida : bebidas) {
+                Bebida bebida = new Bebida(itemBebida.getNome(), itemBebida.getPreco());
+                itensPedido.add(bebida);
+            }
+        }
+
+       Pedido novoPedido = new Pedido(cliente, itensPedido, new PedidoPendenteState()); 
         pedidoRepository.salvarPedido(novoPedido);
     }
 }

@@ -4,10 +4,14 @@
  */
 package com.mycompany.trabalho.delivery.aplicacao.useCases;
 
+import com.mycompany.trabalho.delivery.aplicacao.dto.ItemPedidoBebidaInputDTO;
+import com.mycompany.trabalho.delivery.aplicacao.dto.ItemPedidoPizzaInputDTO;
+import java.util.List;
+
 /**
  *
  * @author Selmo
  */
 public interface ICriarPedidoUseCase {
-    public void executar(String cpf);
+    void executar(String cpf, List<ItemPedidoPizzaInputDTO> pizzas, List<ItemPedidoBebidaInputDTO> bebidas);
 }

@@ -4,11 +4,14 @@
  */
 package com.mycompany.trabalho.delivery.presentation.ui;
 
+import com.mycompany.trabalho.delivery.aplicacao.dto.ItemPedidoBebidaInputDTO;
+import com.mycompany.trabalho.delivery.aplicacao.dto.ItemPedidoPizzaInputDTO;
 import com.mycompany.trabalho.delivery.dominio.model.pedido.Pedido;
 import com.mycompany.trabalho.delivery.presentation.Presenter.ItensPedidoPresenter;
 import com.mycompany.trabalho.delivery.presentation.controllers.ItensPedidoController;
 import com.mycompany.trabalho.delivery.presentation.services.NavegadorDeViews;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -27,6 +30,9 @@ public class ItensPedidoView extends javax.swing.JFrame {
     private ItensPedidoController controller;
     private ItensPedidoPresenter presenter;
     private NavegadorDeViews navegadorDeViews;
+    
+    private List<ItemPedidoPizzaInputDTO> pizzasTemp = new ArrayList<>();
+    private List<ItemPedidoBebidaInputDTO> bebidasTemp = new ArrayList<>();
     
     //para fins de teste
    
@@ -114,59 +120,101 @@ public class ItensPedidoView extends javax.swing.JFrame {
     
     // Listeners dos botões
     private void configurarListeners() {
+
+        btnAddPizzaAoPedido.addActionListener(e -> {
+            String saborSelecionado = cmbListaPizzasBase.getSelectedItem().toString();
+
+            // Cria o DTO
+            ItemPedidoPizzaInputDTO pizzaDTO = new ItemPedidoPizzaInputDTO();
+            pizzaDTO.setSabor(saborSelecionado);
+            // (Se já tiver a lógica de adicionais, preencha a lista de adicionais do DTO aqui)
+
+            // Salva na lista temporária e atualiza a tabela visual
+            pizzasTemp.add(pizzaDTO);
+            adicionarItemNaTabela(pizzasTemp.size(), "Pizza " + saborSelecionado, 1, 0.0); // O valor (0.0) pode ser ajustado depois com o provedor de preços
+            atualizarTotalPedido();
+        });
+        
+        btnAddBebidaPedido.addActionListener(e -> {
+            String nomeBebida = cmbBebida.getSelectedItem().toString();
+
+            ItemPedidoBebidaInputDTO bebidaDTO = new ItemPedidoBebidaInputDTO();
+            bebidaDTO.setNome(nomeBebida);
+            // bebidaDTO.setPreco(...); // Se você tiver o preço no combo ou em outro lugar, defina aqui
+
+            bebidasTemp.add(bebidaDTO);
+            adicionarItemNaTabela(bebidasTemp.size(), nomeBebida, 1, 0.0);
+            atualizarTotalPedido();
+        });
         
         
-       if (btnAddPizzaAoPedido != null) {
-            btnAddPizzaAoPedido.addActionListener(e -> {
-                // Exemplo de como irá capturar os dados da View para o Controller:
-                // String saborBase = (String) cmbListaPizzasBase.getSelectedItem();
-                // controller.adicionarPizzaAoPedido(saborBase, listaDeIngredientesSelecionados);
-                JOptionPane.showMessageDialog(this, "Pizza adicionada (Lógica a ser implementada no Controller).");
-            });
-        }
+        btnFinalizarPedido.addActionListener(e -> {
+            if (pizzasTemp.isEmpty() && bebidasTemp.isEmpty()) {
+                mostrarMensagem("Adicione pelo menos um item ao pedido!");
+                return;
+            }
 
-        if (btnAddBebidaPedido != null) {
-            btnAddBebidaPedido.addActionListener(e -> {
-                // String bebida = (String) cmbBebida.getSelectedItem();
-                // String tamanho = (String) cmbTamanhoBebida.getSelectedItem();
-                // controller.adicionarBebidaAoPedido(bebida, tamanho);
-                JOptionPane.showMessageDialog(this, "Bebida adicionada (Lógica a ser implementada no Controller).");
-            });
-        }
+            try {
+                // Envia tudo para o Controller!
+                controller.salvar(this.cpf, pizzasTemp, bebidasTemp);
 
-        if (btnIncluirAdiciona != null) {
-            btnIncluirAdiciona.addActionListener(e -> {
-                // String ingrediente = (String) cmbIngrediente.getSelectedItem();
-                // Adiciona visualmente na tabela temporária de ingredientes ou chama o controller
-                mostrarMensagem("btnIncluirAdiciona");
-            });
-        }
-
-        if (btnLimparIngredientes != null) {
-            btnLimparIngredientes.addActionListener(e -> {
-                // Limpa a tabela temporária de ingredientes extras da pizza atual
-                mostrarMensagem("btnLimparIngredientes");
-            });
-        }
-
-        if (btnRemoverItem != null) {
-            btnRemoverItem.addActionListener(e -> {
-                // int linhaSelecionada = tblItensPedido.getSelectedRow();
-                // if (linhaSelecionada >= 0) { ... controller.removerItem(id); }
-                mostrarMensagem("btnRemoverItem");
-                
-            });
-        }
-
-        if (btnFinalizarPedido != null) {
-            btnFinalizarPedido.addActionListener(e -> {
-                // controller.finalizarMontagemPedido(this.cpf);
-                JOptionPane.showMessageDialog(this, "Pedido finalizado com sucesso!");
-                
-                // Fecha a tela atual e retorna o foco para a PedidosView
-                this.dispose(); 
-            });
-        }
+                mostrarMensagem("Pedido criado com sucesso!");
+                this.dispose(); // Fecha a tela e volta para a anterior
+            } catch (Exception ex) {
+                mostrarMensagem("Erro ao criar pedido: " + ex.getMessage());
+            }
+        });
+//       if (btnAddPizzaAoPedido != null) {
+//            btnAddPizzaAoPedido.addActionListener(e -> {
+//                // Exemplo de como irá capturar os dados da View para o Controller:
+//                // String saborBase = (String) cmbListaPizzasBase.getSelectedItem();
+//                // controller.adicionarPizzaAoPedido(saborBase, listaDeIngredientesSelecionados);
+//                JOptionPane.showMessageDialog(this, "Pizza adicionada (Lógica a ser implementada no Controller).");
+//            });
+//        }
+//
+//        if (btnAddBebidaPedido != null) {
+//            btnAddBebidaPedido.addActionListener(e -> {
+//                // String bebida = (String) cmbBebida.getSelectedItem();
+//                // String tamanho = (String) cmbTamanhoBebida.getSelectedItem();
+//                // controller.adicionarBebidaAoPedido(bebida, tamanho);
+//                JOptionPane.showMessageDialog(this, "Bebida adicionada (Lógica a ser implementada no Controller).");
+//            });
+//        }
+//
+//        if (btnIncluirAdiciona != null) {
+//            btnIncluirAdiciona.addActionListener(e -> {
+//                // String ingrediente = (String) cmbIngrediente.getSelectedItem();
+//                // Adiciona visualmente na tabela temporária de ingredientes ou chama o controller
+//                mostrarMensagem("btnIncluirAdiciona");
+//            });
+//        }
+//
+//        if (btnLimparIngredientes != null) {
+//            btnLimparIngredientes.addActionListener(e -> {
+//                // Limpa a tabela temporária de ingredientes extras da pizza atual
+//                mostrarMensagem("btnLimparIngredientes");
+//            });
+//        }
+//
+//        if (btnRemoverItem != null) {
+//            btnRemoverItem.addActionListener(e -> {
+//                // int linhaSelecionada = tblItensPedido.getSelectedRow();
+//                // if (linhaSelecionada >= 0) { ... controller.removerItem(id); }
+//                mostrarMensagem("btnRemoverItem");
+//                
+//            });
+//        }
+//
+//        if (btnFinalizarPedido != null) {
+//            btnFinalizarPedido.addActionListener(e -> {
+//                // controller.finalizarMontagemPedido(this.cpf);
+//                JOptionPane.showMessageDialog(this, "Pedido finalizado com sucesso!");
+//                
+//                // Fecha a tela atual e retorna o foco para a PedidosView
+//                this.dispose(); 
+//            });
+//        }
     }
     
     
@@ -301,7 +349,7 @@ public class ItensPedidoView extends javax.swing.JFrame {
 
         lblBebida.setText("Bebida");
 
-        cmbBebida.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbBebida.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Coca-Cola 2L", "Item 2", "Item 3", "Item 4" }));
 
         lblTamanhoBebida.setText("Tamanho");
 
@@ -313,7 +361,7 @@ public class ItensPedidoView extends javax.swing.JFrame {
 
         btnIncluirAdiciona.setText("Incluir Adicional");
 
-        cmbListaPizzasBase.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Calabresa", "quatro queijos", "da casa", "Item 4" }));
+        cmbListaPizzasBase.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Quatro Queijos", "Calabresa", "da casa", "Item 4" }));
 
         lblTotal.setText("Total:");
 

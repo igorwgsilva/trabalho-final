@@ -194,7 +194,9 @@ public class PedidosView extends javax.swing.JFrame {
     private void setLblCpfCliente(String cpf) {
         lblNomeCliente.setText("Pedidos do cliente de CPF: " + cpf);
     }
-    
+    private void completarTabela(){
+        
+    }
     
     private void preencherTabelaPedidos() {
         if (presenter == null || cpf == null) {

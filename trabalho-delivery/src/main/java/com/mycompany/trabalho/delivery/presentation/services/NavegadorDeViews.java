@@ -93,7 +93,7 @@ public class NavegadorDeViews {
     
     //delega abertura de PedidosView para  AbrirPedidosCommand
    public void abrirPedidosView(JFrame parent, String cpf) {
-        INavegacaoCommand command = new AbrirPedidosCommand(pedidoRepo, clienteRepo, logService, this, parent, cpf);
+        INavegacaoCommand command = new AbrirPedidosCommand(pedidoRepo, clienteRepo, pizzaFactory, logService, this, parent, cpf);
         command.executar();
     }
     

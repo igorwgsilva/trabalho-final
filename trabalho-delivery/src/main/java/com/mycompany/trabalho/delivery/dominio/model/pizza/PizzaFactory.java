@@ -23,19 +23,19 @@ public class PizzaFactory implements IPizzaFactory {
         PizzaBuilder builder;
         
         switch (sabor.toLowerCase()) {
-            case "calabresa":
+            case "pizza calabresa":
                 builder = new CalabresaBuilder(provedorPrecos);
                 break;
-            case "modadacasa":
+            case "moda da casa":
                 builder = new ModaDaCasaBuilder(provedorPrecos);
                 break;
             case "portuguesa":
                 builder = new PortuguesaBuilder(provedorPrecos);
                 break;
-            case "quatroqueijos":
+            case "quatro queijos":
                 builder = new QuatroQueijosBuilder(provedorPrecos);
                 break;
-            case "frangocatupiry":
+            case "frango com catupiry":
                 builder = new FrangoCatupiryBuilder(provedorPrecos);
                 break;
             default:

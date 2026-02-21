@@ -4,6 +4,8 @@
  */
 package com.mycompany.trabalho.delivery.presentation.services;
 
+import com.mycompany.trabalho.delivery.aplicacao.useCases.CriarPedidoUseCase;
+import com.mycompany.trabalho.delivery.aplicacao.useCases.ICriarPedidoUseCase;
 import com.mycompany.trabalho.delivery.aplicacao.useCases.MontarPedidoUseCase;
 import com.mycompany.trabalho.delivery.dominio.model.pizza.IPizzaFactory;
 import com.mycompany.trabalho.delivery.dominio.port.IClienteRepository;
@@ -49,11 +51,11 @@ public class AbrirItensPedidoCommand implements INavegacaoCommand {
     @Override
     public void executar() {
         //instanciação do Use Case
-        MontarPedidoUseCase montarPedidoUC = new MontarPedidoUseCase(pedidoRepo, clienteRepo, pizzaFactory);
+        ICriarPedidoUseCase criarPedidoUC = new CriarPedidoUseCase(pedidoRepo, clienteRepo, pizzaFactory);
                 
 
         //instanciação do Controller e Presenter
-        ItensPedidoController controller = new ItensPedidoController(montarPedidoUC);
+        ItensPedidoController controller = new ItensPedidoController(criarPedidoUC);
         ItensPedidoPresenter presenter = new ItensPedidoPresenter();
 
         // Injeção na View
