@@ -50,26 +50,15 @@ public class AbrirItensPedidoCommand implements INavegacaoCommand {
     
     @Override
     public void executar() {
-        //instanciação do Use Case
         ICriarPedidoUseCase criarPedidoUC = new CriarPedidoUseCase(pedidoRepo, clienteRepo, pizzaFactory);
-                
-
-        //instanciação do Controller e Presenter
         ItensPedidoController controller = new ItensPedidoController(criarPedidoUC);
-        ItensPedidoPresenter presenter = new ItensPedidoPresenter();
+        ItensPedidoPresenter presenter = new ItensPedidoPresenter(this.provedor);
+        ItensPedidoView view = new ItensPedidoView(parent, cpf, controller, presenter, navegador);
 
-        // Injeção na View
-        ItensPedidoView view = new ItensPedidoView(parent, cpf, controller, presenter, navegador); //TODO Arrumar 
-//                parent, cpf, controller, presenter, navegador);
-
-        // Lógica de UI (Bloqueio da tela anterior)
         parent.setEnabled(false);
         view.setLocationRelativeTo(parent);
         view.setVisible(true);
        
-
-        
-        //prepara para tela pai se tornar ativa ao fechar esta
         view.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {

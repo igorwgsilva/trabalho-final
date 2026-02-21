@@ -119,11 +119,7 @@ public class ClienteView extends javax.swing.JFrame {
             this.mostrarMensagem("Limpando campos de entrada");
         });
 
-        //Ação botao pesquisar
-        btnPesquisar.addActionListener((ActionEvent e) -> {
-//           pesquisa();
-            this.mostrarMensagem("Pesquisar ainda não implementado"); //TODO
-        });
+        
 
         //botão Pedidos cliente===================================================================================
         btnPedidosDoCliente.addActionListener((ActionEvent e) -> {        
@@ -286,7 +282,6 @@ public class ClienteView extends javax.swing.JFrame {
         lblNumero = new javax.swing.JLabel();
         txtNumero = new javax.swing.JTextField();
         btnPedidosDoCliente = new javax.swing.JButton();
-        btnPesquisar = new javax.swing.JButton();
         lblCPF = new javax.swing.JLabel();
         txtCPF = new javax.swing.JTextField();
 
@@ -343,9 +338,6 @@ public class ClienteView extends javax.swing.JFrame {
         btnPedidosDoCliente.setText("Pedidos do Cliente");
         btnPedidosDoCliente.addActionListener(this::btnPedidosDoClienteActionPerformed);
 
-        btnPesquisar.setText("Pesquisar");
-        btnPesquisar.addActionListener(this::btnPesquisarActionPerformed);
-
         lblCPF.setText("CPF");
 
         txtCPF.addActionListener(this::txtCPFActionPerformed);
@@ -371,8 +363,6 @@ public class ClienteView extends javax.swing.JFrame {
                         .addComponent(btnSalvar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLimpar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnPesquisar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnExcluir))
                     .addGroup(layout.createSequentialGroup()
@@ -392,9 +382,6 @@ public class ClienteView extends javax.swing.JFrame {
                             .addComponent(lblCPF))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtCPF, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(txtRua)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(txtCidade)
@@ -403,7 +390,9 @@ public class ClienteView extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtCPF, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
@@ -442,8 +431,7 @@ public class ClienteView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSalvar)
                     .addComponent(btnLimpar)
-                    .addComponent(btnExcluir)
-                    .addComponent(btnPesquisar))
+                    .addComponent(btnExcluir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -453,10 +441,6 @@ public class ClienteView extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnPesquisarActionPerformed
 
     private void btnPedidosDoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPedidosDoClienteActionPerformed
         // TODO add your handling code here:
@@ -495,7 +479,6 @@ public class ClienteView extends javax.swing.JFrame {
     private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnPedidosDoCliente;
-    private javax.swing.JButton btnPesquisar;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JLabel lblBairro;
     private javax.swing.JLabel lblCPF;

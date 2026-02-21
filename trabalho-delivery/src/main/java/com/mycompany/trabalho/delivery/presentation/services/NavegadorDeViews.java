@@ -96,7 +96,5 @@ public class NavegadorDeViews {
         INavegacaoCommand command = new AbrirPedidosCommand(pedidoRepo, clienteRepo, pizzaFactory, logService, this, parent, cpf);
         command.executar();
     }
-    
-    
-    
+ 
 }

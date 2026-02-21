@@ -75,7 +75,7 @@ public class ItensPedidoView extends javax.swing.JFrame {
     public void iniciarView(){
         limparTodosCombos();
         limparTabelas();
-        
+        carregarListasDinamicas();
         configurarListeners();
         this.setVisible(true);
     }
@@ -83,10 +83,8 @@ public class ItensPedidoView extends javax.swing.JFrame {
     
     
     public void limparTodosCombos() {
-        
         cmbBebida.removeAllItems();
         cmbIngrediente.removeAllItems();
-        cmbTamanhoBebida.removeAllItems();
     }
     
     public void adicionarOpcaoBebida(String nomeBebida) {
@@ -97,9 +95,6 @@ public class ItensPedidoView extends javax.swing.JFrame {
         cmbIngrediente.addItem(nomeIngrediente);
     }
     
-    public void adicionarOpcaoTamanhoBebida(String tamanho) {
-        cmbTamanhoBebida.addItem(tamanho);
-    }
     
     public void limparTabelas(){ //esvazia as tabelas
         DefaultTableModel modelPizza = (DefaultTableModel) tblAdicionaisPizza.getModel();
@@ -122,16 +117,16 @@ public class ItensPedidoView extends javax.swing.JFrame {
     private void configurarListeners() {
 
         btnAddPizzaAoPedido.addActionListener(e -> {
-            String saborSelecionado = cmbListaPizzasBase.getSelectedItem().toString();
+            if (cmbListaPizzasBase.getSelectedItem() == null) return;
+            String saborCombo = cmbListaPizzasBase.getSelectedItem().toString();
 
-            // Cria o DTO
+            String saborFormatado = saborCombo.toLowerCase().replace("pizza ", "").trim();
+
             ItemPedidoPizzaInputDTO pizzaDTO = new ItemPedidoPizzaInputDTO();
-            pizzaDTO.setSabor(saborSelecionado);
-            // (Se já tiver a lógica de adicionais, preencha a lista de adicionais do DTO aqui)
+            pizzaDTO.setSabor(saborFormatado);
 
-            // Salva na lista temporária e atualiza a tabela visual
             pizzasTemp.add(pizzaDTO);
-            adicionarItemNaTabela(pizzasTemp.size(), "Pizza " + saborSelecionado, 1, 0.0); // O valor (0.0) pode ser ajustado depois com o provedor de preços
+            adicionarItemNaTabela(pizzasTemp.size(), saborCombo, 1, 0.0); 
             atualizarTotalPedido();
         });
         
@@ -236,6 +231,30 @@ public class ItensPedidoView extends javax.swing.JFrame {
 
         lblTotal.setText("Total: "+ total  );
     }
+      
+    public void carregarListasDinamicas() {
+        // Limpa as opções padrão do NetBeans ("Item 1", "Item 2", etc)
+        cmbListaPizzasBase.removeAllItems();
+        cmbBebida.removeAllItems();
+        cmbIngrediente.removeAllItems();
+
+        if (presenter != null) {
+            // 1. Puxa as Pizzas do JSON e joga no ComboBox
+            for (String pizza : presenter.getPizzas()) {
+                cmbListaPizzasBase.addItem(pizza);
+            }
+
+            // 2. Puxa as Bebidas do JSON e joga no ComboBox
+            for (String bebida : presenter.getBebidas()) {
+                cmbBebida.addItem(bebida);
+            }
+
+            // 3. Puxa os Adicionais (Ingredientes) do JSON
+            for (String ingrediente : presenter.getIngredientes()) {
+                cmbIngrediente.addItem(ingrediente);
+            }
+        }
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -261,8 +280,6 @@ public class ItensPedidoView extends javax.swing.JFrame {
         btnLimparIngredientes = new javax.swing.JButton();
         lblBebida = new javax.swing.JLabel();
         cmbBebida = new javax.swing.JComboBox<>();
-        lblTamanhoBebida = new javax.swing.JLabel();
-        cmbTamanhoBebida = new javax.swing.JComboBox<>();
         btnAddBebidaPedido = new javax.swing.JButton();
         btnFinalizarPedido = new javax.swing.JButton();
         btnIncluirAdiciona = new javax.swing.JButton();
@@ -349,10 +366,6 @@ public class ItensPedidoView extends javax.swing.JFrame {
 
         cmbBebida.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Coca-Cola 2L", "Item 2", "Item 3", "Item 4" }));
 
-        lblTamanhoBebida.setText("Tamanho");
-
-        cmbTamanhoBebida.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         btnAddBebidaPedido.setText("Adicionar Bebida ao Pedido");
 
         btnFinalizarPedido.setText("Finalizar Pedido");
@@ -392,27 +405,25 @@ public class ItensPedidoView extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnIncluirAdiciona)
                             .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblIngrediente)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbIngrediente, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 644, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnAddPizzaAoPedido)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnLimparIngredientes))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblIngrediente)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbIngrediente, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(scrIngredientesPizza, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblTamanhoBebida)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
-                                .addComponent(lblBebida)))
-                        .addGap(18, 18, 18)
+                        .addComponent(lblBebida)
+                        .addGap(31, 31, 31)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cmbBebida, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addComponent(btnAddBebidaPedido))
-                            .addComponent(cmbTamanhoBebida, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(btnAddBebidaPedido)))))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
@@ -430,31 +441,26 @@ public class ItensPedidoView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblTamanhoPizza)
                     .addComponent(cmbListaPizzasBase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblIngrediente)
+                    .addComponent(cmbIngrediente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addComponent(btnIncluirAdiciona)
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(86, 86, 86)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblBebida)
-                            .addComponent(cmbBebida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblTamanhoBebida)
-                            .addComponent(cmbTamanhoBebida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAddBebidaPedido))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblIngrediente)
-                            .addComponent(cmbIngrediente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(10, 10, 10)
-                        .addComponent(btnIncluirAdiciona)
-                        .addGap(3, 3, 3)
                         .addComponent(scrIngredientesPizza, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnAddPizzaAoPedido)
-                            .addComponent(btnLimparIngredientes))))
+                            .addComponent(btnLimparIngredientes)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblBebida)
+                            .addComponent(cmbBebida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(btnAddBebidaPedido)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrItens, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
@@ -513,12 +519,10 @@ public class ItensPedidoView extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cmbBebida;
     private javax.swing.JComboBox<String> cmbIngrediente;
     private javax.swing.JComboBox<String> cmbListaPizzasBase;
-    private javax.swing.JComboBox<String> cmbTamanhoBebida;
     private javax.swing.JLabel lblBebida;
     private javax.swing.JLabel lblClienteFulano;
     private javax.swing.JLabel lblIngrediente;
     private javax.swing.JLabel lblPedidoID;
-    private javax.swing.JLabel lblTamanhoBebida;
     private javax.swing.JLabel lblTamanhoPizza;
     private javax.swing.JLabel lblTotal;
     private javax.swing.JScrollPane scrIngredientesPizza;
