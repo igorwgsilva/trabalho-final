@@ -22,4 +22,8 @@ public class ItensPedidoPresenter {
     public List<String> getIngredientes() {
         return provedor.buscaIngredientes();
     }
+    
+    public double buscarPreco(String nomeDoItem) {
+        return provedor.buscaPreco(nomeDoItem);
+    }
 }

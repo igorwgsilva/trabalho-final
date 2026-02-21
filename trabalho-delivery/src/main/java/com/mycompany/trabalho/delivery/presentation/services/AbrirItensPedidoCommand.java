@@ -4,19 +4,20 @@
  */
 package com.mycompany.trabalho.delivery.presentation.services;
 
+import com.mycompany.trabalho.delivery.presentation.ui.ItensPedidoView;
 import com.mycompany.trabalho.delivery.aplicacao.useCases.CriarPedidoUseCase;
 import com.mycompany.trabalho.delivery.aplicacao.useCases.ICriarPedidoUseCase;
-import com.mycompany.trabalho.delivery.aplicacao.useCases.MontarPedidoUseCase;
 import com.mycompany.trabalho.delivery.dominio.model.pizza.IPizzaFactory;
 import com.mycompany.trabalho.delivery.dominio.port.IClienteRepository;
 import com.mycompany.trabalho.delivery.dominio.port.IPedidoRepository;
 import com.mycompany.trabalho.delivery.dominio.port.IProvedorDePrecos;
 import com.mycompany.trabalho.delivery.presentation.Presenter.ItensPedidoPresenter;
 import com.mycompany.trabalho.delivery.presentation.controllers.ItensPedidoController;
-import com.mycompany.trabalho.delivery.presentation.ui.ItensPedidoView;
+import javax.swing.JFrame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JFrame;
+import com.mycompany.trabalho.delivery.aplicacao.useCases.ISimularPizzaUseCase;
+import com.mycompany.trabalho.delivery.aplicacao.useCases.SimularPizzaUseCase;
 
 /**
  *
@@ -50,15 +51,16 @@ public class AbrirItensPedidoCommand implements INavegacaoCommand {
     
     @Override
     public void executar() {
-        ICriarPedidoUseCase criarPedidoUC = new CriarPedidoUseCase(pedidoRepo, clienteRepo, pizzaFactory);
-        ItensPedidoController controller = new ItensPedidoController(criarPedidoUC);
+        ICriarPedidoUseCase criarPedidoUC = new CriarPedidoUseCase(pedidoRepo, clienteRepo, pizzaFactory, null, provedor);
+        ISimularPizzaUseCase simularPizzaUC = new SimularPizzaUseCase(pizzaFactory, provedor);
+        ItensPedidoController controller = new ItensPedidoController(criarPedidoUC, simularPizzaUC);
+        
         ItensPedidoPresenter presenter = new ItensPedidoPresenter(this.provedor);
         ItensPedidoView view = new ItensPedidoView(parent, cpf, controller, presenter, navegador);
-
+        
         parent.setEnabled(false);
         view.setLocationRelativeTo(parent);
         view.setVisible(true);
-       
         view.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {

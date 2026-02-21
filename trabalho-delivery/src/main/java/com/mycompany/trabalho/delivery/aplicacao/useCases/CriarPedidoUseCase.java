@@ -8,10 +8,12 @@ import com.mycompany.trabalho.delivery.dominio.model.pedido.Item;
 import com.mycompany.trabalho.delivery.dominio.model.pedido.Pedido;
 import com.mycompany.trabalho.delivery.dominio.model.pedido.PedidoPendenteState;
 import com.mycompany.trabalho.delivery.dominio.model.pizza.IPizzaFactory;
+import com.mycompany.trabalho.delivery.dominio.model.pizza.Ingrediente;
 import com.mycompany.trabalho.delivery.dominio.model.pizza.PizzaComponente;
 import com.mycompany.trabalho.delivery.dominio.port.IClienteRepository;
 import com.mycompany.trabalho.delivery.dominio.port.ILogService;
 import com.mycompany.trabalho.delivery.dominio.port.IPedidoRepository;
+import com.mycompany.trabalho.delivery.dominio.port.IProvedorDePrecos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,15 @@ public class CriarPedidoUseCase implements ICriarPedidoUseCase {
     private final IClienteRepository clienteRepository;
     private final IPizzaFactory pizzaFactory; 
     private final ILogService logger; 
+    private final IProvedorDePrecos provedorPrecos; 
+
+    public CriarPedidoUseCase(IPedidoRepository pedidoRepository, IClienteRepository clienteRepository, IPizzaFactory pizzaFactory, ILogService logger, IProvedorDePrecos provedorPrecos) {
+        this.pedidoRepository = pedidoRepository;
+        this.clienteRepository = clienteRepository;
+        this.pizzaFactory = pizzaFactory;
+        this.logger = logger;
+        this.provedorPrecos = provedorPrecos;
+    }
 
    
     public CriarPedidoUseCase(IPedidoRepository pedidoRepository, IClienteRepository clienteRepository, IPizzaFactory pizzaFactory, ILogService logger) {
@@ -32,6 +43,7 @@ public class CriarPedidoUseCase implements ICriarPedidoUseCase {
         this.clienteRepository = clienteRepository;
         this.pizzaFactory = pizzaFactory;
         this.logger = logger;
+        this.provedorPrecos = null;
     }
 
     public CriarPedidoUseCase(IPedidoRepository pedidoRepository, IClienteRepository clienteRepository, IPizzaFactory pizzaFactory) {
@@ -39,6 +51,7 @@ public class CriarPedidoUseCase implements ICriarPedidoUseCase {
         this.clienteRepository = clienteRepository;
         this.pizzaFactory = pizzaFactory;
         this.logger = null; 
+        this.provedorPrecos = null;
     }
     
     public void executar(String cpf, List<ItemPedidoPizzaInputDTO> pizzas, List<ItemPedidoBebidaInputDTO> bebidas) {
@@ -51,10 +64,21 @@ public class CriarPedidoUseCase implements ICriarPedidoUseCase {
         List<Item> itensPedido = new ArrayList<>();
 
         if (pizzas != null) {
+            if (pizzas != null) {
             for (ItemPedidoPizzaInputDTO itemPizza : pizzas) {
+               
                 PizzaComponente pizza = pizzaFactory.criarPizza(itemPizza.getSabor());
+               if (itemPizza.getAdicionais() != null && provedorPrecos != null) {
+                    for (String nomeAdicional : itemPizza.getAdicionais()) {
+                        double precoAdicional = provedorPrecos.buscaPreco(nomeAdicional);
+                        // A pizza atual é "embrulhada" por um novo ingrediente
+                        pizza = new Ingrediente(pizza, nomeAdicional, precoAdicional); 
+                    }
+                }
+                
                 itensPedido.add(pizza);
             }
+        }
         }
 
         if (bebidas != null) {

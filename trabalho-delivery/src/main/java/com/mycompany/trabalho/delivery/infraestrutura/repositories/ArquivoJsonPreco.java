@@ -75,15 +75,14 @@ public class ArquivoJsonPreco implements IProvedorDePrecos{
     }
     
     @Override
-    public List<String> buscaBebidas(){
-        if(cardapio==null){
-            return new ArrayList<>();
-        }
-        return cardapio.keySet().stream()
-                .filter(item -> item.toLowerCase().contains("coca-cola") 
-                || item.toLowerCase().endsWith("ml") || item.toLowerCase().endsWith("l"))
-                .collect(Collectors.toList());
+public List<String> buscaBebidas(){
+    if(cardapio==null){
+        return new ArrayList<>();
     }
+    return cardapio.keySet().stream()
+            .filter(item -> item.toLowerCase().contains("coca-cola"))
+            .collect(Collectors.toList());
+}
     
     @Override
     public List<String> buscaIngredientes(){

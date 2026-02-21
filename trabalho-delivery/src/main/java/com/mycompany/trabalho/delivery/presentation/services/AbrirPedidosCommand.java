@@ -50,6 +50,7 @@ public class AbrirPedidosCommand implements INavegacaoCommand{
         this.cpf = cpf;
     }
     
+    
      @Override
     public void executar() {
         //casos de uso(camada de aplicação)
